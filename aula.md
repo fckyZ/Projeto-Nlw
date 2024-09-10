@@ -6,3 +6,4 @@ Sequencia de logica com passos finitos para resolver problemas.
 Coletar os dados
 Processar os dados 
 Apresentar os dados
+
