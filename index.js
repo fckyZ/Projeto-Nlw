@@ -1,79 +1,90 @@
-const {select, input, checkbox} = require(`@inquirer/prompts`)
-let metas = []
+// Importar as funções necessárias do módulo @inquirer/prompts
+const { select, input, checkbox } = require('@inquirer/prompts');
 
+// Criar um array para armazenar as metas
+let metas = [];
+
+// Função para cadastrar uma nova meta
 const cadastrarMeta = async () => {
-    const meta = await input({ message: "Digite a Meta: "})
+  // Solicitar ao usuário que digite a meta
+  const meta = await input({ message: 'Digite a Meta:' });
 
-    if (meta.length == 0) {
-        console.log("A Meta Não Pode Ser Vazia")
-        return
-    }
+  // Verificar se a meta está vazia
+  if (meta.length === 0) {
+    console.log('A Meta Não Pode Ser Vazia');
+    return; // Encerrar a função se a meta estiver vazia
+  }
 
-    metas.push({value: meta, checked: false})
-}
+  // Adicionar a nova meta à lista com o status "não marcada"
+  metas.push({ value: meta, checked: false });
+};
 
+// Função para listar as metas e permitir que o usuário as marque
 const listarMeta = async () => {
-    const resposta = await checkbox ({
-        message: "Use as Setas Para Mudar de Meta, o Espaço Para Marcar e Descarcar e o Enter Para Finalizar Essa Etapa",
-        choices: [...metas],
-        instructions: false,                 
-    })
+  // Exibir as metas para o usuário marcar
+  const resposta = await checkbox({
+    message: 'Use as Setas Para Mudar de Meta, o Espaço Para Marcar e Descarcar e o Enter Para Finalizar Essa Etapa',
+    choices: [...metas], // Criar uma cópia das metas para evitar modificações indesejadas
+    instructions: false,
+  });
 
-    if (resposta.length == 0) {
-        console.log("Nenhuma Meta Selecionada !!!")
-        return
-    }
+  // Verificar se nenhuma meta foi selecionada
+  if (resposta.length === 0) {
+    console.log('Nenhuma Meta Selecionada !!!');
+    return;
+  }
 
-    metas.forEach((m) => {
-        m.checked = false
-    })
+  // Resetar o status de todas as metas para "não marcada"
+  metas.forEach((m) => {
+    m.checked = false;
+  });
 
-    resposta.forEach((r) => {
-        const meta = metas.find((m) => {
-            return m.value == resposta
-        })
+  // Atualizar o status das metas selecionadas para "marcada"
+  resposta.forEach((r) => {
+    const meta = metas.find((m) => {
+      return m.value === r;
+    });
 
-        meta.checked = true
-    })
+    meta.checked = true;
+  });
+};
 
-}
-
+// Função principal para iniciar a aplicação
 const start = async () => {
+  // Loop infinito para manter a aplicação rodando até o usuário sair
+  while (true) {
+    // Exibir o menu principal
+    const opc = await select({
+      message: 'Menu >',
+      choices: [
+        {
+          name: 'Cadastrar Meta',
+          value: 'cadastrar',
+        },
+        {
+          name: 'Listar Metas',
+          value: 'listar',
+        },
+        {
+          name: 'Sair',
+          value: 'sair',
+        },
+      ],
+    });
 
-
-    while (true) {
-        const opc = await select({
-            message: "Menu >",
-            choices: [
-                {
-                    name: "Cadastrar Meta",
-                    value: "cadastrar"
-                },
-                {
-                    name: "Listar Metas",
-                    value: "listar"
-                },
-                {
-                    name: "Sair",
-                    value: "sair"
-                }
-            ]
-
-        })
-
-        switch (opc) {
-            case "cadastrar":
-                await cadastrarMeta()
-                console.log(metas)
-                break
-            case "listar":
-                await listarMeta()
-                break
-            case "sair":
-                return
-        }
+    // Executar a ação correspondente à opção escolhida
+    switch (opc) {
+      case 'cadastrar':
+        await cadastrarMeta();
+        break;
+      case 'listar':
+        await listarMeta();
+        break;
+      case 'sair':
+        return; // Sair do loop e encerrar a aplicação
     }
-}
+  }
+};
 
-start()
-
+// Iniciar a aplicação
+start();
