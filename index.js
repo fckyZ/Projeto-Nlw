@@ -17,6 +17,7 @@ const cadastrarMeta = async () => {
 
   // Adicionar a nova meta à lista com o status "não marcada"
   metas.push({ value: meta, checked: false });
+  console.log(metas);
 };
 
 // Função para listar as metas e permitir que o usuário as marque
@@ -28,16 +29,16 @@ const listarMeta = async () => {
     instructions: false,
   });
 
+  // Resetar o status de todas as metas para "não marcada"
+  metas.forEach((m) => {
+    m.checked = false;
+  });
+
   // Verificar se nenhuma meta foi selecionada
   if (resposta.length === 0) {
     console.log('Nenhuma Meta Selecionada !!!');
     return;
   }
-
-  // Resetar o status de todas as metas para "não marcada"
-  metas.forEach((m) => {
-    m.checked = false;
-  });
 
   // Atualizar o status das metas selecionadas para "marcada"
   resposta.forEach((r) => {
@@ -48,6 +49,42 @@ const listarMeta = async () => {
     meta.checked = true;
   });
 };
+
+// Função para as metas realizadas
+const metasRealizadas = async () => {
+  const realizadas = metas.filter((meta) => {
+      return meta.checked;
+  })
+  
+  if (realizadas.length == 0) {
+    console.log("Não Existem Metas Realizadas !");
+    return;
+  } 
+
+  await select ({
+    message: "Metas Realizadas" + realizadas.length,
+    choices: [...realizadas]
+  })
+
+}
+
+const metasAbertas = async () => {
+  const abertas = metas.filter((meta) => {
+    return !metasRealizadas.checked;
+  })
+
+  if (abertas.length == 0) {
+    console.log("Não Existem Metas Abertas !");
+    return;
+  }
+
+  await select ({
+    message: "Metas Abertas" + abertas.length,
+    choices: [...abertas]
+  })
+
+
+}
 
 // Função principal para iniciar a aplicação
 const start = async () => {
@@ -66,6 +103,18 @@ const start = async () => {
           value: 'listar',
         },
         {
+          name: 'Metas Realizadas',
+          value: 'realizadas'
+        },
+        {
+          name: 'Metas Abertas',
+          value: 'abertas'
+        },
+        {
+          name: 'Deletar Metas',
+          value: 'deletar'
+        },
+        {
           name: 'Sair',
           value: 'sair',
         },
@@ -74,13 +123,19 @@ const start = async () => {
 
     // Executar a ação correspondente à opção escolhida
     switch (opc) {
-      case 'cadastrar':
+      case "cadastrar":
         await cadastrarMeta();
         break;
-      case 'listar':
+      case "listar":
         await listarMeta();
         break;
-      case 'sair':
+      case "realizadas":
+        await metasRealizadas();
+        break;
+      case "abertas":
+        await metasAbertas();
+        break;
+      case "sair":
         return; // Sair do loop e encerrar a aplicação
     }
   }
