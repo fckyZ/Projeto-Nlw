@@ -1,5 +1,23 @@
 // Importar as funções necessárias do módulo @inquirer/prompts
 const { select, input, checkbox } = require('@inquirer/prompts');
+const fs = require("fs").promises;
+
+// Variavel de controle
+let mensagem = "Bem Vindo ao App";
+
+const carregarMeta = async () => {
+    try {
+      const dados = await fs.readFile("metas.json", "utf-8");
+      metas = JSON.parse(dados);
+    }
+    catch (erro) {
+      metas = [];
+    }
+}
+
+const salvarMeta = async () => {
+  await fs.writeFile("metas.json", JSON.stringify(metas, null, 2));
+}
 
 // Criar um array para armazenar as metas
 let metas = [];
@@ -11,7 +29,7 @@ const cadastrarMeta = async () => {
 
   // Verificar se a meta está vazia
   if (meta.length === 0) {
-    console.log('A Meta Não Pode Ser Vazia');
+    mensagem = 'A Meta Não Pode Ser Vazia';
     return; // Encerrar a função se a meta estiver vazia
   }
 
@@ -36,7 +54,7 @@ const listarMeta = async () => {
 
   // Verificar se nenhuma meta foi selecionada
   if (resposta.length === 0) {
-    console.log('Nenhuma Meta Selecionada !!!');
+    mensagem = 'Nenhuma Meta Selecionada !!!';
     return;
   }
 
@@ -57,7 +75,7 @@ const metasRealizadas = async () => {
   })
   
   if (realizadas.length == 0) {
-    console.log("Não Existem Metas Realizadas !");
+    mensagem = "Não Existem Metas Realizadas !";
     return;
   } 
 
@@ -74,7 +92,7 @@ const metasAbertas = async () => {
   })
 
   if (abertas.length == 0) {
-    console.log("Não Existem Metas Abertas !");
+  mensagem = "Não Existem Metas Abertas !";
     return;
   }
 
@@ -87,34 +105,42 @@ const metasAbertas = async () => {
 }
 
 const deletarMetas = async () => {
-  const metasDesmarcadas = metas.map((meta) => {
-    return {value: meta.value, checked: false}
-  })
+  const metasDesmarcadas = metas.map((meta) => ({ value: meta.value, checked: false }));
 
   const deletando = await checkbox({
-    message: 'Selecione um Item Para Selecionar',
-    choices: [...metasDesmarcadas], // Criar uma cópia das metas para evitar modificações indesejadas
+    message: 'Selecione um Item Para Deletar',
+    choices: [...metasDesmarcadas],
     instructions: false,
   });
 
-  if (deletando.length == 0) {
-    console.log("Nenhum Item a Deletar");
-    return
+  if (deletando.length === 0) {
+    mensagem = "Nenhum Item a Deletar";
+    return;
   }
 
-  deletando.forEach((i) => {
-    metas.filter((meta) => {
-      return meta.value != i;
-    })
-  })
+  // Filtrar e atribuir o resultado ao array metas
+  metas = metas.filter((meta) => !deletando.includes(meta.value));
 
-  console.log("Meta(s) Deletada(s)");
+  mensagem = "Meta(s) Deletada(s)";
+};
+
+const mostrarMensagem = () => {
+  console.clear();
 }
 
 // Função principal para iniciar a aplicação
 const start = async () => {
+  await carregarMeta();
   // Loop infinito para manter a aplicação rodando até o usuário sair
   while (true) {
+    mostrarMensagem();
+
+    if (mensagem != "" ) {
+      console.log(mensagem);
+      console.log("");
+      mensagem = "";
+    }
+
     // Exibir o menu principal
     const opc = await select({
       message: 'Menu >',
@@ -150,9 +176,11 @@ const start = async () => {
     switch (opc) {
       case "cadastrar":
         await cadastrarMeta();
+        await salvarMeta();
         break;
       case "listar":
         await listarMeta();
+        await salvarMeta();
         break;
       case "realizadas":
         await metasRealizadas();
@@ -162,6 +190,7 @@ const start = async () => {
         break;
       case "deletar":
         await deletarMetas();
+        await salvarMeta();
         break;
       case "sair":
         return; // Sair do loop e encerrar a aplicação
