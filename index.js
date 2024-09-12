@@ -62,7 +62,7 @@ const metasRealizadas = async () => {
   } 
 
   await select ({
-    message: "Metas Realizadas" + realizadas.length,
+    message: "Metas Realizadas : " + realizadas.length,
     choices: [...realizadas]
   })
 
@@ -79,11 +79,36 @@ const metasAbertas = async () => {
   }
 
   await select ({
-    message: "Metas Abertas" + abertas.length,
+    message: "Metas Abertas : " + abertas.length,
     choices: [...abertas]
   })
 
 
+}
+
+const deletarMetas = async () => {
+  const metasDesmarcadas = metas.map((meta) => {
+    return {value: meta.value. checked: false}
+  })
+
+  const deletando = await checkbox({
+    message: 'Selecione um Item Para Selecionar',
+    choices: [...metasDesmarcadas], // Criar uma cópia das metas para evitar modificações indesejadas
+    instructions: false,
+  });
+
+  if (deletando.length == 0) {
+    console.log("Nenhum Item a Deletar");
+    return
+  }
+
+  deletando.forEach((i) => {
+    metas.filter((meta) => {
+      return meta.value != i;
+    })
+  })
+
+  console.log("Meta(s) Deletada(s)");
 }
 
 // Função principal para iniciar a aplicação
