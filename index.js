@@ -88,7 +88,7 @@ const metasAbertas = async () => {
 
 const deletarMetas = async () => {
   const metasDesmarcadas = metas.map((meta) => {
-    return {value: meta.value. checked: false}
+    return {value: meta.value, checked: false}
   })
 
   const deletando = await checkbox({
