@@ -40,6 +40,10 @@ const cadastrarMeta = async () => {
 
 // Função para listar as metas e permitir que o usuário as marque
 const listarMeta = async () => {
+  if (metas.length == 0) {
+    return
+  }
+
   // Exibir as metas para o usuário marcar
   const resposta = await checkbox({
     message: 'Use as Setas Para Mudar de Meta, o Espaço Para Marcar e Descarcar e o Enter Para Finalizar Essa Etapa',
@@ -70,6 +74,9 @@ const listarMeta = async () => {
 
 // Função para as metas realizadas
 const metasRealizadas = async () => {
+  if (metas.length == 0) {
+    return
+  }
   const realizadas = metas.filter((meta) => {
       return meta.checked;
   })
@@ -87,6 +94,9 @@ const metasRealizadas = async () => {
 }
 
 const metasAbertas = async () => {
+  if (metas.length == 0) {
+    return
+  }
   const abertas = metas.filter((meta) => {
     return !metasRealizadas.checked;
   })
